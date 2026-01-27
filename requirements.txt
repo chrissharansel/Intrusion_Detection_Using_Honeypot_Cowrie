@@ -1,0 +1,7 @@
+Flask
+Flask-SocketIO
+eventlet
+gunicorn
+pandas
+requests
+joblib
