@@ -1,6 +1,6 @@
 from time import time
 from typing import Dict
-from ids_dashboard.integrated_ids_engine import IntegratedIDSEngine
+from integrated_ids_engine import IntegratedIDSEngine
 
 
 # Main execution
