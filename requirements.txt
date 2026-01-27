@@ -26,3 +26,4 @@ tzdata
 
 # Optional but recommended
 python-socketio
+gunicorn
