@@ -391,10 +391,10 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         </div>
         
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('dashboard')">
+            <div class="tab active" onclick="switchTab('dashboard', this)">
                 <i class="fas fa-chart-line"></i> Dashboard
             </div>
-            <div class="tab" onclick="switchTab('control')">
+            <div class="tab" onclick="switchTab('control', this)">
                 <i class="fas fa-sliders"></i> Control Center
             </div>
         </div>
