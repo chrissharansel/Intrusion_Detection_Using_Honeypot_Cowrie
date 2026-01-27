@@ -3,8 +3,17 @@ Advanced IDS Dashboard - Main Application (Part 1/4)
 Fixed Model Switching Logic
 """
 
+import eventlet
+eventlet.monkey_patch()
+
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from flask import Flask, render_template_string, jsonify, request, send_file
 from flask_socketio import SocketIO, emit
+
+
+
+
 import pandas as pd
 import json
 import io
@@ -20,14 +29,17 @@ import requests
 MODEL_DIR = os.path.join(os.getcwd(), "models")
 
 from integrated_ids_engine import IntegratedIDSEngine
+IST = ZoneInfo("Asia/Kolkata")
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+# socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+
 
 # Global state
 ids_engine = None
-dashboard_start_time = datetime.now()
+dashboard_start_time = datetime.now(IST)
 initialization_complete = False
 current_model = None
 ip_blacklist = set()
@@ -87,7 +99,8 @@ class AttackSimulator:
                 'src_ip': f"{base_ip}.{random.randint(1, 254)}",
                 'dst_port': random.choice([80, 443, 8080]),
                 'packet_count': random.randint(1000, 10000),
-                'timestamp': datetime.now().isoformat()
+                'timestamp': datetime.now(IST).isoformat()
+
             })
         return attacks
     
@@ -104,7 +117,8 @@ class AttackSimulator:
                 'src_ip': f"192.168.{random.randint(0, 255)}.{random.randint(1, 254)}",
                 'payload': random.choice(payloads),
                 'target': '/login.php',
-                'timestamp': datetime.now().isoformat()
+                'timestamp': datetime.now(IST).isoformat()
+
             })
         return attacks
     
@@ -120,7 +134,8 @@ class AttackSimulator:
                 'username': random.choice(usernames),
                 'password': f"pass{random.randint(1000, 9999)}",
                 'service': 'ssh',
-                'timestamp': datetime.now().isoformat()
+                'timestamp': datetime.now(IST).isoformat()
+
             })
         return attacks
     
@@ -137,7 +152,8 @@ class AttackSimulator:
                 'src_ip': f"10.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(1, 254)}",
                 'command': random.choice(commands),
                 'target': '/api/exec',
-                'timestamp': datetime.now().isoformat()
+                'timestamp': datetime.now(IST).isoformat()
+
             })
         return attacks
     
@@ -151,7 +167,8 @@ class AttackSimulator:
                 'src_ip': f"203.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(1, 254)}",
                 'malware_type': random.choice(malware_types),
                 'file_hash': ''.join(random.choices('abcdef0123456789', k=32)),
-                'timestamp': datetime.now().isoformat()
+                'timestamp': datetime.now(IST).isoformat()
+
             })
         return attacks
     
@@ -164,7 +181,8 @@ class AttackSimulator:
                 'src_ip': f"45.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(1, 254)}",
                 'exploit': f"CVE-2024-{random.randint(10000, 99999)}",
                 'target_service': random.choice(['apache', 'nginx', 'mysql', 'redis']),
-                'timestamp': datetime.now().isoformat()
+                'timestamp': datetime.now(IST).isoformat()
+
             })
         return attacks
     
@@ -269,7 +287,8 @@ def switch_model():
         socketio.emit("model_switched", {
             "model": model_name,
             "message": f"Successfully switched to {model_name}",
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now(IST).isoformat()
+
         })
 
         # Force immediate stats update with new model name
@@ -317,7 +336,8 @@ def simulate_attack():
     socketio.emit('simulation_started', {
         'attack_type': attack_type,
         'count': len(attacks),
-        'timestamp': datetime.now().isoformat()
+        'timestamp': datetime.now(IST).isoformat()
+
     })
     
     return jsonify({
@@ -547,7 +567,8 @@ def get_attack_timeline():
     
     for incident in incidents:
         try:
-            ts = datetime.fromisoformat(incident['timestamp'].replace('Z', '+00:00'))
+           # ts = datetime.fromisoformat(incident['timestamp'].replace('Z', '+00:00'))
+            ts = datetime.fromisoformat(incident['timestamp'])
             hour_key = ts.strftime('%Y-%m-%d %H:00')
             timeline[hour_key] += 1
         except:
@@ -750,7 +771,7 @@ def initialize_ids(model_dir, model_name=None):
 # Main entry point
 if __name__ == '__main__':
     import sys
-
+    port = int(os.environ.get("PORT", 5000))
     init_model = sys.argv[1] if len(sys.argv) > 1 else None
 
     threading.Thread(
@@ -759,4 +780,5 @@ if __name__ == '__main__':
         daemon=True
     ).start()
 
-    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
+    socketio.run(app, host='0.0.0.0', port=port, debug=False)
+
