@@ -732,8 +732,35 @@ def initialize_ids(model_dir, model_name=None):
     global ids_engine, initialization_complete, current_model
 
     try:
+        if CLOUD_MODE:
+            print("☁ CLOUD MODE ENABLED — Skipping Cowrie initialization")
+
+            ids_engine = IntegratedIDSEngine(
+                cowrie_host=None,
+                cowrie_user=None,
+                cowrie_key=None,
+                model_dir=model_dir,
+                model_name=model_name
+            )
+
+            ids_engine.register_alert_callback(broadcast_new_incident)
+
+            initialization_complete = True
+            current_model = ids_engine.model_info.get('name', 'XGBoost')
+
+            print(f"✓ CLOUD IDS READY with model: {current_model}")
+
+            socketio.emit('initialization_complete', {
+                'status': 'ready',
+                'model': current_model
+            })
+
+            return  # 🔴 IMPORTANT: DO NOT CONTINUE
+
+        # =========================
+        # LOCAL / REAL COWRIE MODE
+        # =========================
         print("\n🔧 Initializing Advanced IDS (Cowrie Integrated)...")
-        print(f"📡 Cowrie Host: {COWRIE_HOST}")
 
         ids_engine = IntegratedIDSEngine(
             COWRIE_HOST,
@@ -743,14 +770,11 @@ def initialize_ids(model_dir, model_name=None):
             model_name
         )
 
-
         ids_engine.register_alert_callback(broadcast_new_incident)
 
         if ids_engine.start():
             initialization_complete = True
-
-            if hasattr(ids_engine, 'model_info'):
-                current_model = ids_engine.model_info.get('name')
+            current_model = ids_engine.model_info.get('name')
 
             print(f"✓ IDS initialized successfully with model: {current_model}")
 
@@ -767,6 +791,46 @@ def initialize_ids(model_dir, model_name=None):
         print(f"❌ Initialization error: {e}")
         print(traceback.format_exc())
         initialization_complete = False
+
+# def initialize_ids(model_dir, model_name=None):
+#     global ids_engine, initialization_complete, current_model
+
+#     try:
+#         print("\n🔧 Initializing Advanced IDS (Cowrie Integrated)...")
+#         print(f"📡 Cowrie Host: {COWRIE_HOST}")
+
+#         ids_engine = IntegratedIDSEngine(
+#             COWRIE_HOST,
+#             COWRIE_USER,
+#             COWRIE_KEY,
+#             model_dir,
+#             model_name
+#         )
+
+
+#         ids_engine.register_alert_callback(broadcast_new_incident)
+
+#         if ids_engine.start():
+#             initialization_complete = True
+
+#             if hasattr(ids_engine, 'model_info'):
+#                 current_model = ids_engine.model_info.get('name')
+
+#             print(f"✓ IDS initialized successfully with model: {current_model}")
+
+#             socketio.emit('initialization_complete', {
+#                 'status': 'ready',
+#                 'model': current_model
+#             })
+#         else:
+#             initialization_complete = False
+#             print("❌ IDS failed to start")
+
+#     except Exception as e:
+#         import traceback
+#         print(f"❌ Initialization error: {e}")
+#         print(traceback.format_exc())
+#         initialization_complete = False
 
 # Main entry point
 if __name__ == '__main__':
