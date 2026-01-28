@@ -151,15 +151,26 @@ async function selectModel(modelName) {
 }
 
 // ✅ FIX: Update active model UI
+// function updateActiveModelUI(modelName) {
+//     document.querySelectorAll('.model-option').forEach(option => {
+//         option.classList.remove('active');
+//         const optionModelName = option.querySelector('.model-name').textContent.trim().substring(2).trim();
+//         if (optionModelName === modelName) {
+//             option.classList.add('active');
+//         }
+//     });
+// }
+
 function updateActiveModelUI(modelName) {
     document.querySelectorAll('.model-option').forEach(option => {
         option.classList.remove('active');
-        const optionModelName = option.querySelector('.model-name').textContent.trim().substring(2).trim();
-        if (optionModelName === modelName) {
+
+        if (option.dataset.model === modelName) {
             option.classList.add('active');
         }
     });
 }
+
 
 // Load and update stats
 async function loadStats() {
