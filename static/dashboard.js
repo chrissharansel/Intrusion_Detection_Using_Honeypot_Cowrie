@@ -107,12 +107,11 @@ socket.on('blacklist_updated', function(data) {
 //         loadTopAttackers();
 //     }
 // }
-
 function switchTab(tabName, el) {
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-    el.classList.add('active'); // ❌ crashes if el is undefined
+    el.classList.add('active');
     document.getElementById(tabName + '-tab').classList.add('active');
 
     if (tabName === 'control') {
@@ -120,7 +119,6 @@ function switchTab(tabName, el) {
         loadTopAttackers();
     }
 }
-
 
 
 // ✅ FIXED: Model selection with proper UI update
@@ -151,26 +149,15 @@ async function selectModel(modelName) {
 }
 
 // ✅ FIX: Update active model UI
-// function updateActiveModelUI(modelName) {
-//     document.querySelectorAll('.model-option').forEach(option => {
-//         option.classList.remove('active');
-//         const optionModelName = option.querySelector('.model-name').textContent.trim().substring(2).trim();
-//         if (optionModelName === modelName) {
-//             option.classList.add('active');
-//         }
-//     });
-// }
-
 function updateActiveModelUI(modelName) {
     document.querySelectorAll('.model-option').forEach(option => {
         option.classList.remove('active');
-
-        if (option.dataset.model === modelName) {
+        const optionModelName = option.querySelector('.model-name').textContent.trim().substring(2).trim();
+        if (optionModelName === modelName) {
             option.classList.add('active');
         }
     });
 }
-
 
 // Load and update stats
 async function loadStats() {
