@@ -107,11 +107,12 @@ socket.on('blacklist_updated', function(data) {
 //         loadTopAttackers();
 //     }
 // }
+
 function switchTab(tabName, el) {
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-    el.classList.add('active');
+    el.classList.add('active'); // ❌ crashes if el is undefined
     document.getElementById(tabName + '-tab').classList.add('active');
 
     if (tabName === 'control') {
@@ -119,6 +120,7 @@ function switchTab(tabName, el) {
         loadTopAttackers();
     }
 }
+
 
 
 // ✅ FIXED: Model selection with proper UI update

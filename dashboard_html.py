@@ -517,22 +517,37 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                     </div>
                 </div>
                 <div class="model-grid" id="model-selection">
-                    <div class="model-option" onclick="selectModel('Random Forest')">
+                    # <div class="model-option" onclick="selectModel('Random Forest')">
+                    #     <div class="model-name">🌲 Random Forest</div>
+                    #     <div class="model-desc">Ensemble tree-based classifier with high accuracy</div>
+                    # </div>
+                    # <div class="model-option" onclick="selectModel('XGBoost')">
+                    #     <div class="model-name">⚡ XGBoost</div>
+                    #     <div class="model-desc">Gradient boosting with excellent performance</div>
+                    # </div>
+                    # <div class="model-option" onclick="selectModel('Decision Tree')">
+                    #     <div class="model-name">🌳 Decision Tree</div>
+                    #     <div class="model-desc">Simple rule-based tree classifier</div>
+                    # </div>
+                    # <div class="model-option" onclick="selectModel('KNN')">
+                    #     <div class="model-name">📍 K-Nearest Neighbors</div>
+                    #     <div class="model-desc">Distance-based classifier</div>
+                    # </div>
+                    <div class="model-option" data-model="Random Forest"
+                        onclick="selectModel('Random Forest')">
                         <div class="model-name">🌲 Random Forest</div>
-                        <div class="model-desc">Ensemble tree-based classifier with high accuracy</div>
                     </div>
-                    <div class="model-option" onclick="selectModel('XGBoost')">
+
+                    <div class="model-option" data-model="XGBoost"
+                        onclick="selectModel('XGBoost')">
                         <div class="model-name">⚡ XGBoost</div>
-                        <div class="model-desc">Gradient boosting with excellent performance</div>
                     </div>
-                    <div class="model-option" onclick="selectModel('Decision Tree')">
-                        <div class="model-name">🌳 Decision Tree</div>
-                        <div class="model-desc">Simple rule-based tree classifier</div>
-                    </div>
-                    <div class="model-option" onclick="selectModel('KNN')">
+
+                    <div class="model-option" data-model="KNN"
+                        onclick="selectModel('KNN')">
                         <div class="model-name">📍 K-Nearest Neighbors</div>
-                        <div class="model-desc">Distance-based classifier</div>
                     </div>
+
                     <div class="model-option" onclick="selectModel('Logistic Regression')">
                         <div class="model-name">📈 Logistic Regression</div>
                         <div class="model-desc">Linear probabilistic classifier</div>
