@@ -9,9 +9,9 @@ def main():
     """Main execution with trained model"""
     
     # Configuration
-    COWRIE_HOST = "98.94.3.233"
+    COWRIE_HOST = "34.207.216.238"
     COWRIE_USER = "ubuntu"
-    COWRIE_KEY = "cowrie_key.pem"
+    COWRIE_KEY = "cowrie-key.pem"
     MODEL_DIR = "models"
     
     # Initialize IDS with trained model

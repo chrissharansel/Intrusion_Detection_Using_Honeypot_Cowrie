@@ -16,6 +16,7 @@ from typing import Dict, List, Callable, Optional
 from cowrie_monitor import CowrieMonitor
 from cowrie_feature_mapper import CowrieToNSLKDDMapper
 
+
 CLOUD_MODE = os.environ.get("CLOUD_MODE", "false").lower() == "true"
 
 

@@ -358,6 +358,22 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             .header { flex-direction: column; gap: 20px; } 
             .stats-grid { grid-template-columns: 1fr; } 
         }
+
+        .btn-logout {
+    background: linear-gradient(135deg, #64748b, #334155); /* subtle gray-blue */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-logout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(100, 116, 139, 0.4);
+}
     </style>
 </head>
 <script src="/static/dashboard.js"></script>
@@ -378,15 +394,26 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                     <span class="badge badge-pro">REAL-TIME</span>
                 </div>
             </div>
-            <div style="display: flex; gap: 20px; align-items: center;">
+            <div style="display: flex; gap: 12px; align-items: center;">
+    
                 <div class="status-pill initializing" id="statusPill">
                     <div class="status-dot initializing" id="statusDot"></div>
                     <div>
                         <div style="font-weight: 600; font-size: 1.1em;" id="statusText">Initializing</div>
-                        <div style="font-size: 0.85em; color: #94a3b8;">Model: <span id="current-model-display">Loading...</span></div>
+                        <div style="font-size: 0.85em; color: #94a3b8;">
+                            Model: <span id="current-model-display">Loading...</span>
+                        </div>
                     </div>
                 </div>
-                <button class="btn-export" onclick="exportData()"><i class="fas fa-download"></i> Export Report</button>
+
+                <button class="btn-export" onclick="exportData()">
+                    <i class="fas fa-download"></i> Export Report
+                </button>
+
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-right-from-bracket"></i> Logout
+                </button>
+
             </div>
         </div>
         
