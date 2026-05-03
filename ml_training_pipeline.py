@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn import pipeline
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
@@ -356,67 +357,196 @@ class IDSMLPipeline:
         
         return results_df
     
+    # def save_models(self, output_dir='models'):
+    #     """Save all trained models and preprocessors"""
+    #     print("\n" + "="*70)
+    #     print("💾 SAVING MODELS")
+    #     print("="*70)
+        
+    #     os.makedirs(output_dir, exist_ok=True)
+        
+    #     # Save each model
+    #     for name, model_info in self.models.items():
+    #         model_filename = f"{output_dir}/{name.replace(' ', '_').lower()}.pkl"
+    #         joblib.dump(model_info['model'], model_filename)
+    #         print(f"✓ Saved {name}")
+    #         print(f"  → {model_filename}")
+        
+    #     # Save scaler
+    #     scaler_filename = f"{output_dir}/scaler.pkl"
+    #     joblib.dump(self.scaler, scaler_filename)
+    #     print(f"✓ Saved StandardScaler")
+    #     print(f"  → {scaler_filename}")
+        
+    #     # Save label encoders
+    #     encoders_filename = f"{output_dir}/label_encoders.pkl"
+    #     joblib.dump(self.label_encoders, encoders_filename)
+    #     print(f"✓ Saved Label Encoders ({len(self.label_encoders)} encoders)")
+    #     print(f"  → {encoders_filename}")
+        
+    #     # Save feature columns
+    #     features_filename = f"{output_dir}/feature_columns.pkl"
+    #     joblib.dump(self.feature_columns, features_filename)
+    #     print(f"✓ Saved Feature Columns ({len(self.feature_columns)} features)")
+    #     print(f"  → {features_filename}")
+        
+    #     # Save best model info
+    #     best_model_info = {
+    #         'name': self.best_model['name'],
+    #         'dataset': self.dataset_type,
+    #         'num_features': len(self.feature_columns),
+    #         'metrics': {
+    #             k: float(v) if isinstance(v, (np.floating, np.integer)) else str(v)
+    #             for k, v in self.best_model['metrics'].items() 
+    #             if k != 'Confusion Matrix'
+    #         },
+    #         'confusion_matrix': {
+    #             'TN': int(self.best_model['metrics']['Confusion Matrix'][0][0]),
+    #             'FP': int(self.best_model['metrics']['Confusion Matrix'][0][1]),
+    #             'FN': int(self.best_model['metrics']['Confusion Matrix'][1][0]),
+    #             'TP': int(self.best_model['metrics']['Confusion Matrix'][1][1])
+    #         },
+    #         'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    #         'feature_columns': self.feature_columns
+    #     }
+        
+    #     with open(f"{output_dir}/best_model_info.json", 'w') as f:
+    #         json.dump(best_model_info, f, indent=2)
+    #     print(f"✓ Saved Best Model Metadata")
+    #     print(f"  → {output_dir}/best_model_info.json")
+        
+    #     print(f"\n{'='*70}")
+    #     print(f"✅ All models saved to '{output_dir}/' directory")
+    #     print(f"{'='*70}")
+
+
+
+
+
     def save_models(self, output_dir='models'):
-        """Save all trained models and preprocessors"""
+        """Save all trained models + preprocessors + individual metadata"""
+
         print("\n" + "="*70)
         print("💾 SAVING MODELS")
         print("="*70)
-        
+
         os.makedirs(output_dir, exist_ok=True)
-        
-        # Save each model
+
+        # -------------------------
+        # 1. Save individual models
+        # -------------------------
         for name, model_info in self.models.items():
-            model_filename = f"{output_dir}/{name.replace(' ', '_').lower()}.pkl"
+
+            safe_name = name.replace(" ", "_").lower()
+
+            model_filename = os.path.join(
+                output_dir,
+                f"{safe_name}.pkl"
+            )
+
             joblib.dump(model_info['model'], model_filename)
-            print(f"✓ Saved {name}")
-            print(f"  → {model_filename}")
-        
-        # Save scaler
-        scaler_filename = f"{output_dir}/scaler.pkl"
-        joblib.dump(self.scaler, scaler_filename)
-        print(f"✓ Saved StandardScaler")
-        print(f"  → {scaler_filename}")
-        
-        # Save label encoders
-        encoders_filename = f"{output_dir}/label_encoders.pkl"
-        joblib.dump(self.label_encoders, encoders_filename)
-        print(f"✓ Saved Label Encoders ({len(self.label_encoders)} encoders)")
-        print(f"  → {encoders_filename}")
-        
-        # Save feature columns
-        features_filename = f"{output_dir}/feature_columns.pkl"
-        joblib.dump(self.feature_columns, features_filename)
-        print(f"✓ Saved Feature Columns ({len(self.feature_columns)} features)")
-        print(f"  → {features_filename}")
-        
-        # Save best model info
-        best_model_info = {
-            'name': self.best_model['name'],
-            'dataset': self.dataset_type,
-            'num_features': len(self.feature_columns),
-            'metrics': {
-                k: float(v) if isinstance(v, (np.floating, np.integer)) else str(v)
-                for k, v in self.best_model['metrics'].items() 
-                if k != 'Confusion Matrix'
-            },
-            'confusion_matrix': {
-                'TN': int(self.best_model['metrics']['Confusion Matrix'][0][0]),
-                'FP': int(self.best_model['metrics']['Confusion Matrix'][0][1]),
-                'FN': int(self.best_model['metrics']['Confusion Matrix'][1][0]),
-                'TP': int(self.best_model['metrics']['Confusion Matrix'][1][1])
-            },
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'feature_columns': self.feature_columns
-        }
-        
-        with open(f"{output_dir}/best_model_info.json", 'w') as f:
-            json.dump(best_model_info, f, indent=2)
-        print(f"✓ Saved Best Model Metadata")
-        print(f"  → {output_dir}/best_model_info.json")
-        
-        print(f"\n{'='*70}")
-        print(f"✅ All models saved to '{output_dir}/' directory")
-        print(f"{'='*70}")
+            print(f"✓ Saved model: {name} → {safe_name}.pkl")
+
+        # -------------------------
+        # 2. Save preprocessors
+        # -------------------------
+        joblib.dump(
+            self.scaler,
+            os.path.join(output_dir, "scaler.pkl")
+        )
+
+        joblib.dump(
+            self.label_encoders,
+            os.path.join(output_dir, "label_encoders.pkl")
+        )
+
+        joblib.dump(
+            self.feature_columns,
+            os.path.join(output_dir, "feature_columns.pkl")
+        )
+
+        print("✓ Saved scaler, label encoders, feature columns")
+
+        # -------------------------
+        # 3. Save EACH model metadata separately (IMPORTANT FIX)
+        # -------------------------
+        if not self.results:
+            print("⚠️ WARNING: self.results is empty. Run evaluate_models() first.")
+
+        for name, result in self.results.items():
+            try:
+                safe_name = name.replace(" ", "_").lower()
+
+                model_info = {
+                    "name": name,
+                    "dataset": getattr(self, "dataset_type", "Unknown"),
+                    "metrics": {
+                        "accuracy": float(result.get("Accuracy", 0)),
+                        "precision": float(result.get("Precision", 0)),
+                        "recall": float(result.get("Recall", 0)),
+                        "f1_score": float(
+                            result.get("F1-Score", result.get("F-1 Score", 0))
+                        ),
+                        "roc_auc": float(result.get("ROC-AUC", 0)),
+                        "fpr": float(result.get("FPR", 0))
+                    },
+                    "training_time_sec": float(result.get("Training Time (s)", 0)),
+                    "prediction_time_sec": float(result.get("Prediction Time (s)", 0)),
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+
+                json_path = os.path.join(
+                    output_dir,
+                    f"{safe_name}_info.json"
+                )
+
+                with open(json_path, "w") as f:
+                    json.dump(model_info, f, indent=2)
+
+                print(f"✓ Saved {safe_name}_info.json")
+
+            except Exception as e:
+                print(f"⚠️ Failed saving {name}: {e}")
+
+        # -------------------------
+        # 4. Best model metadata
+        # -------------------------
+        if hasattr(self, "best_model") and self.best_model:
+
+            best_safe_name = self.best_model["name"].replace(" ", "_").lower()
+
+            best_model_info = {
+                "name": self.best_model["name"],
+                "dataset": getattr(self, "dataset_type", "Unknown"),
+                "num_features": len(self.feature_columns),
+                "metrics": {
+                    k: float(v) if isinstance(v, (np.floating, np.integer, float, int)) else str(v)
+                    for k, v in self.best_model["metrics"].items()
+                    if k != "Confusion Matrix"
+                },
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "feature_columns": self.feature_columns
+            }
+
+            with open(
+                os.path.join(output_dir, f"{best_safe_name}_best_model.json"),
+                "w"
+            ) as f:
+                json.dump(best_model_info, f, indent=2)
+
+            print("✓ Saved best model metadata")
+
+        else:
+            print("⚠️ best_model not found — skipping best model file")
+
+        # -------------------------
+        # DONE
+        # -------------------------
+        print("\n" + "="*70)
+        print("✅ ALL MODELS SAVED SUCCESSFULLY")
+        print("="*70)
+
+
     
     # def save_models(self, output_dir='models'):
     #     """Save all trained models and preprocessors (DEPLOYMENT SAFE)"""
@@ -731,6 +861,9 @@ def main():
     pipeline.generate_report(results_df)
     
     print("\n✅ Pipeline completed successfully!")
+
+
+
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,15 @@
+{
+  "name": "Random Forest",
+  "dataset": "nsl-kdd",
+  "metrics": {
+    "accuracy": 0.7730660042583393,
+    "precision": 0.966961152123926,
+    "recall": 0.6226135743785552,
+    "f1_score": 0.7574895714827455,
+    "roc_auc": 0.9729309676471503,
+    "fpr": 0.028112449799196786
+  },
+  "training_time_sec": 6.138272047042847,
+  "prediction_time_sec": 0.12286758422851562,
+  "timestamp": "2026-05-03 23:14:38"
+}

@@ -795,3 +795,86 @@ class IntegratedIDSEngine:
         
         print("\n✓ IDS Engine stopped")
 
+    def switch_model(self, model_name: str):
+        """Properly switch model + reload its metrics"""
+
+        print(f"\n🔁 Switching model → {model_name}")
+
+        try:
+            # Load model
+            model_path = os.path.join(self.model_dir, f"{model_name}.pkl")
+            self.model = joblib.load(model_path)
+
+            # Load model info (IMPORTANT)
+            info_path = os.path.join(self.model_dir, f"{model_name}_info.json")
+
+            if os.path.exists(info_path):
+                with open(info_path, 'r') as f:
+                    self.model_info = json.load(f)
+            else:
+                print(f"⚠ No info file for {model_name}")
+                self.model_info = {
+                    "name": model_name,
+                    "metrics": {"Accuracy": 0, "F1-Score": 0}
+                }
+
+            # 🔥 CRITICAL: Reset stats (avoid mixing models)
+            self._reset_stats()
+
+            print(f"✅ Model switched to {model_name}")
+
+        except Exception as e:
+            print(f"❌ Model switch failed: {e}")
+            raise
+
+    def _reset_stats(self):
+        """Reset stats when model changes"""
+        self.stats = {
+            'total_events': 0,
+            'total_sessions': 0,
+            'attacks_detected': 0,
+            'normal_sessions': 0,
+            'unique_attackers': set(),
+            'attack_types': defaultdict(int),
+            'severity_counts': defaultdict(int),
+            'model_predictions': {'attack': 0, 'normal': 0},
+            'confidence_scores': [],
+            'hourly_activity': defaultdict(int)
+        }
+
+        self.recent_incidents.clear()
+        self.session_predictions.clear()
+
+    def load_model_by_name(self, model_name: str):
+        """
+        Dynamically load model selected from UI
+        """
+
+        print(f"\n🔁 Switching to model: {model_name}")
+
+        try:
+            # 1. Load model file
+            model_file = model_name.replace(" ", "_").lower() + ".pkl"
+            self.model = joblib.load(f"{self.model_dir}/{model_file}")
+
+            # 2. Load scaler + features (always same)
+            self.scaler = joblib.load(f"{self.model_dir}/scaler.pkl")
+            self.feature_columns = joblib.load(f"{self.model_dir}/feature_columns.pkl")
+
+            # 3. Load metadata from ALL MODELS JSON
+            with open(f"{self.model_dir}/all_models_info.json", "r") as f:
+                all_models = json.load(f)
+
+            self.model_info = {
+                "name": model_name,
+                "metrics": all_models.get(model_name, {})
+            }
+
+            print("✅ Model switched successfully")
+            print(f"📊 Accuracy: {self.model_info['metrics'].get('accuracy', 'N/A')}")
+            print(f"📊 F1-score: {self.model_info['metrics'].get('f1_score', 'N/A')}")
+
+        except Exception as e:
+            print(f"❌ Failed to switch model: {e}")
+            raise
+

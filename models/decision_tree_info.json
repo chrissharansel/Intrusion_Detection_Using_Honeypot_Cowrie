@@ -1,0 +1,15 @@
+{
+  "name": "Decision Tree",
+  "dataset": "nsl-kdd",
+  "metrics": {
+    "accuracy": 0.7720014194464159,
+    "precision": 0.9651711210545411,
+    "recall": 0.6219122574612328,
+    "f1_score": 0.756421192304047,
+    "roc_auc": 0.8027244114834561,
+    "fpr": 0.029657089898053754
+  },
+  "training_time_sec": 1.0468456745147705,
+  "prediction_time_sec": 0.015754222869873047,
+  "timestamp": "2026-05-03 23:14:38"
+}

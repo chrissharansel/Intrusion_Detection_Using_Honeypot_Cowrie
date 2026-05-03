@@ -1,25 +1,19 @@
 {
-  "name": "LightGBM",
+  "name": "XGBoost",
   "dataset": "nsl-kdd",
   "num_features": 41,
   "metrics": {
-    "Model": "LightGBM",
-    "Accuracy": 0.8034510290986515,
-    "Precision": 0.9681301537775797,
-    "Recall": 0.6770045975220136,
-    "F1-Score": 0.7968083642866969,
-    "ROC-AUC": 0.9612133524918617,
-    "FPR": 0.029451137884872823,
-    "Training Time (s)": "0.986419677734375",
-    "Prediction Time (s)": "0.03952932357788086"
+    "Model": "XGBoost",
+    "Accuracy": 0.8081973030518098,
+    "Precision": 0.9681963244195004,
+    "Recall": 0.6855762487337334,
+    "F1-Score": 0.8027372262773723,
+    "ROC-AUC": 0.9692924874304957,
+    "FPR": 0.02976006590464422,
+    "Training Time (s)": 2.1900594234466553,
+    "Prediction Time (s)": 0.10446858406066895
   },
-  "confusion_matrix": {
-    "TN": 9425,
-    "FP": 286,
-    "FN": 4145,
-    "TP": 8688
-  },
-  "timestamp": "2026-01-25 19:09:06",
+  "timestamp": "2026-05-03 22:55:43",
   "feature_columns": [
     "duration",
     "protocol_type",

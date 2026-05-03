@@ -1,0 +1,15 @@
+{
+  "name": "XGBoost",
+  "dataset": "nsl-kdd",
+  "metrics": {
+    "accuracy": 0.8081973030518098,
+    "precision": 0.9681963244195004,
+    "recall": 0.6855762487337334,
+    "f1_score": 0.8027372262773723,
+    "roc_auc": 0.9692924874304957,
+    "fpr": 0.02976006590464422
+  },
+  "training_time_sec": 2.9742863178253174,
+  "prediction_time_sec": 0.05859375,
+  "timestamp": "2026-05-03 23:14:38"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "LightGBM",
+  "dataset": "nsl-kdd",
+  "metrics": {
+    "accuracy": 0.8034510290986515,
+    "precision": 0.9681301537775797,
+    "recall": 0.6770045975220136,
+    "f1_score": 0.7968083642866969,
+    "roc_auc": 0.9612133524918617,
+    "fpr": 0.029451137884872823
+  },
+  "training_time_sec": 1.974130630493164,
+  "prediction_time_sec": 0.04562258720397949,
+  "timestamp": "2026-05-03 23:14:38"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Logistic Regression",
+  "dataset": "nsl-kdd",
+  "metrics": {
+    "accuracy": 0.7539478353442157,
+    "precision": 0.9252860144758347,
+    "recall": 0.6176264318553729,
+    "f1_score": 0.7407822795457731,
+    "roc_auc": 0.871427310121227,
+    "fpr": 0.06590464421789723
+  },
+  "training_time_sec": 3.1595611572265625,
+  "prediction_time_sec": 0.01572728157043457,
+  "timestamp": "2026-05-03 23:14:38"
+}

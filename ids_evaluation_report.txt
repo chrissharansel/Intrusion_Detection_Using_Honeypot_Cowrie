@@ -1,0 +1,66 @@
+================================================================================
+        INTRUSION DETECTION SYSTEM - ML MODEL EVALUATION REPORT
+================================================================================
+
+Generated: 2026-05-03 23:14:41
+Dataset: NSL-KDD
+Number of Features: 41
+Number of Models Trained: 6
+
+--------------------------------------------------------------------------------
+MODEL PERFORMANCE SUMMARY
+--------------------------------------------------------------------------------
+              Model  Accuracy  Precision   Recall  F1-Score  ROC-AUC      FPR
+            XGBoost  0.808197   0.968196 0.685576  0.802737 0.969292 0.029760
+           LightGBM  0.803451   0.968130 0.677005  0.796808 0.961213 0.029451
+      Random Forest  0.773066   0.966961 0.622614  0.757490 0.972931 0.028112
+      Decision Tree  0.772001   0.965171 0.621912  0.756421 0.802724 0.029657
+K-Nearest Neighbors  0.767566   0.971205 0.609756  0.749162 0.822842 0.023890
+Logistic Regression  0.753948   0.925286 0.617626  0.740782 0.871427 0.065905
+
+--------------------------------------------------------------------------------
+BEST MODEL DETAILS
+--------------------------------------------------------------------------------
+Model: XGBoost
+Accuracy:  80.82%
+Precision: 96.82%
+Recall:    68.56%
+F1-Score:  80.27%
+ROC-AUC:   0.9693
+
+Confusion Matrix:
+  True Negatives (TN):     9,422
+  False Positives (FP):      289
+  False Negatives (FN):    4,035
+  True Positives (TP):     8,798
+
+Detection Metrics:
+  False Positive Rate: 2.98%
+  False Negative Rate: 31.44%
+  Detection Rate (TPR): 68.56%
+
+--------------------------------------------------------------------------------
+HONEYPOT INTEGRATION RECOMMENDATIONS
+--------------------------------------------------------------------------------
+1. Deploy Model: Use 'XGBoost' for real-time detection
+2. Detection Threshold: Set at 0.75-0.85 for balanced accuracy
+3. Expected Performance:
+   - Detection Rate: 68.6% of attacks will be detected
+   - False Alarms: 2.98% of normal traffic flagged as attacks
+4. Model Loading: Use models/best_model_info.json for configuration
+5. Feature Requirements: Ensure all 41 features are extracted
+
+--------------------------------------------------------------------------------
+DEPLOYMENT CHECKLIST
+--------------------------------------------------------------------------------
+[ ] Load trained model from models/ directory
+[ ] Load scaler.pkl for feature normalization
+[ ] Load label_encoders.pkl for categorical features
+[ ] Verify feature_columns.pkl matches input data
+[ ] Set up alert thresholds based on FPR tolerance
+[ ] Monitor model performance on live data
+[ ] Plan for model retraining with honeypot data
+
+================================================================================
+END OF REPORT
+================================================================================
