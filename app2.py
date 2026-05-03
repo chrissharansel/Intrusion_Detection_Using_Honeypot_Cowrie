@@ -176,7 +176,7 @@ CRITICAL FIX: Proper model switching with stats synchronization
 
 @app.route('/')
 def index():
-    from dashboard_html import DASHBOARD_HTML
+    from dashboard_html1 import DASHBOARD_HTML
     return render_template_string(DASHBOARD_HTML)
 
 

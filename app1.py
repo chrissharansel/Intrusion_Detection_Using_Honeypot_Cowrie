@@ -1141,6 +1141,14 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
+
+
+from analytics_routes import analytics_bp
+app.register_blueprint(analytics_bp)
+
+
+
+
 # ─── Global State ─────────────────────────────────────────────────────────────
 ids_engine = None
 dashboard_start_time = datetime.now()

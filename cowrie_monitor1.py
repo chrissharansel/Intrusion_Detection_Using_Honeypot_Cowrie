@@ -266,7 +266,6 @@ class CowrieMonitor:
         self.running = False
         self.event_callback = None
         self.monitor_thread = None
-        self.last_event_time = None   # ✅ ADD THIS
 
     # =========================
     # SSH CONNECTION
@@ -339,20 +338,10 @@ class CowrieMonitor:
                 try:
                     event = json.loads(line.strip())
 
-                    event_time = event.get("timestamp")
-
-                    # ✅ SKIP OLD / DUPLICATE EVENTS
-                    if self.last_event_time and event_time:
-                        if event_time <= self.last_event_time:
-                            continue
-
-                    # ✅ Update latest timestamp
-                    if event_time:
-                        self.last_event_time = event_time
-
-                    # ✅ Save + process
+                    # ✅ NEW: Persist locally
                     self.save_raw_event_locally(event)
 
+                    # Existing behavior (IDS engine)
                     if self.event_callback:
                         self.event_callback(event)
 
@@ -390,14 +379,9 @@ class CowrieMonitor:
             for line in stdout:
                 try:
                     event = json.loads(line.strip())
-
-                    # ✅ Track latest timestamp
-                    event_time = event.get("timestamp")
-
-                    if event_time:
-                        self.last_event_time = event_time
-
                     events.append(event)
+
+                    # ✅ Also persist historical logs locally
                     self.save_raw_event_locally(event)
 
                 except:
@@ -442,8 +426,8 @@ if __name__ == "__main__":
         print(f"[LIVE] {event.get('eventid')} from {event.get('src_ip')}")
 
     if monitor.connect():
-        monitor.get_historical_logs(1000)   # load past
-        monitor.start_monitoring(on_event)  # then live
+        monitor.get_historical_logs(100)
+        monitor.start_monitoring(on_event)
 
         try:
             while True:
