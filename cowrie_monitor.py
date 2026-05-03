@@ -297,7 +297,7 @@ class CowrieMonitor:
             self.ssh_client.close()
             print("✓ Disconnected from Cowrie honeypot")
 
-    # =========================
+    # =========================s
     # LOCAL PERSISTENCE (NEW)
     # =========================
     def save_raw_event_locally(self, event: Dict):

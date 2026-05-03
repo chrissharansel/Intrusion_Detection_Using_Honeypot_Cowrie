@@ -28,10 +28,7 @@ results/
 # =========================
 # Security / Secrets (IMPORTANT)
 # =========================
-*.pem
-*.key
-*.crt
-*.env
+
 
 # =========================
 # IDE / Editor
