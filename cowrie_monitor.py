@@ -416,9 +416,9 @@ class CowrieMonitor:
 # STANDALONE TEST
 # =========================
 if __name__ == "__main__":
-    COWRIE_HOST = "98.94.3.233"
+    COWRIE_HOST = "34.207.216.238"
     COWRIE_USER = "ubuntu"
-    COWRIE_KEY = "cowrie_key.pem"
+    COWRIE_KEY = "cowrie-key.pem"
 
     monitor = CowrieMonitor(COWRIE_HOST, COWRIE_USER, COWRIE_KEY)
 

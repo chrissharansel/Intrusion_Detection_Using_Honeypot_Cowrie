@@ -1,6 +1,10 @@
 // Advanced IDS Dashboard - Complete JavaScript with Fixed Model Switching
 
-const socket = io();
+const socket = io({
+    transports: ['websocket', 'polling'],
+    upgrade: true
+});
+
 let charts = {};
 let currentActiveModel = null;
 
@@ -91,18 +95,31 @@ socket.on('blacklist_updated', function(data) {
 });
 
 // Tab switching
-function switchTab(tabName) {
+// function switchTab(tabName) {
+//     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+//     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+//     event.target.closest('.tab').classList.add('active');
+//     document.getElementById(tabName + '-tab').classList.add('active');
+    
+//     if (tabName === 'control') {
+//         loadModelPerformance();
+//         loadTopAttackers();
+//     }
+// }
+function switchTab(tabName, el) {
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    
-    event.target.closest('.tab').classList.add('active');
+
+    el.classList.add('active');
     document.getElementById(tabName + '-tab').classList.add('active');
-    
+
     if (tabName === 'control') {
         loadModelPerformance();
         loadTopAttackers();
     }
 }
+
 
 // ✅ FIXED: Model selection with proper UI update
 async function selectModel(modelName) {
@@ -176,20 +193,28 @@ async function loadStats() {
 
 function updateStats(stats) {
 
-    // ✅ CRITICAL FIX — hide loader when backend is ready
-    if (stats.initialized === true) {
-        document.getElementById('loadingOverlay').classList.add('hidden');
+    // 🚨 FORCE dashboard visible once stats arrive
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay && !overlay.classList.contains('hidden')) {
+        overlay.classList.add('hidden');
 
-        document.getElementById('statusPill').classList.remove('initializing');
-        document.getElementById('statusDot').classList.remove('initializing');
+        document.getElementById('statusPill')?.classList.remove('initializing');
+        document.getElementById('statusDot')?.classList.remove('initializing');
         document.getElementById('statusText').textContent = 'Active';
     }
 
+
     const modelName = stats.model_name || currentActiveModel || 'Loading...';
 
-    document.getElementById('total-events').textContent = stats.total_events || 0;
-    document.getElementById('attacks-detected').textContent = stats.attacks_detected || 0;
-    document.getElementById('unique-attackers').textContent = stats.unique_attackers || 0;
+    const setText = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        };
+
+        setText('total-events', stats.total_events || 0);
+        setText('attacks-detected', stats.attacks_detected || 0);
+        setText('unique-attackers', stats.unique_attackers || 0);
+
     document.getElementById('ml-predictions').textContent = stats.total_events || 0;
 
     document.getElementById('events-per-min').textContent =
@@ -213,8 +238,50 @@ function updateStats(stats) {
         `${stats.avg_confidence || 0}%`;
 }
 
+
+// function updateStats(stats) {
+
+//     // ✅ CRITICAL FIX — hide loader when backend is ready
+//     if (stats.initialized === true) {
+//         document.getElementById('loadingOverlay').classList.add('hidden');
+
+//         document.getElementById('statusPill').classList.remove('initializing');
+//         document.getElementById('statusDot').classList.remove('initializing');
+//         document.getElementById('statusText').textContent = 'Active';
+//     }
+
+//     const modelName = stats.model_name || currentActiveModel || 'Loading...';
+
+//     document.getElementById('total-events').textContent = stats.total_events || 0;
+//     document.getElementById('attacks-detected').textContent = stats.attacks_detected || 0;
+//     document.getElementById('unique-attackers').textContent = stats.unique_attackers || 0;
+//     document.getElementById('ml-predictions').textContent = stats.total_events || 0;
+
+//     document.getElementById('events-per-min').textContent =
+//         `${stats.events_per_minute || 0} events/min`;
+
+//     document.getElementById('attack-rate').textContent =
+//         `${stats.attack_rate || 0}% attack rate`;
+
+//     document.getElementById('ml-prediction-rate').textContent =
+//         `${stats.model_predictions?.normal || 0} normal`;
+
+//     updateModelDisplay(modelName);
+
+//     document.getElementById('model-accuracy').textContent =
+//         `${stats.model_accuracy || 0}%`;
+
+//     document.getElementById('model-f1').textContent =
+//         `${stats.model_f1 || 0}%`;
+
+//     document.getElementById('avg-confidence').textContent =
+//         `${stats.avg_confidence || 0}%`;
+// }
+
+
 // Chart initialization
 function initializeCharts() {
+    if (charts.timeline) return; 
     const chartConfig = {
         responsive: true,
         maintainAspectRatio: false,

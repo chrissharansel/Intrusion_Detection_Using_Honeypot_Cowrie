@@ -2,7 +2,7 @@
 Integrated IDS Engine - Uses Trained ML Model with Cowrie Data
 Combines trained NSL-KDD/UNSW-NB15 model with live Cowrie honeypot logs
 """
-
+import os
 import time
 import threading
 import joblib
@@ -15,6 +15,9 @@ from typing import Dict, List, Callable, Optional
 
 from cowrie_monitor import CowrieMonitor
 from cowrie_feature_mapper import CowrieToNSLKDDMapper
+
+
+CLOUD_MODE = os.environ.get("CLOUD_MODE", "false").lower() == "true"
 
 
 class IntegratedIDSEngine:
@@ -36,10 +39,15 @@ class IntegratedIDSEngine:
             model_name: Specific model to use (e.g., 'random_forest', 'xgboost')
                     If None, uses best_model_info.json
         """
+
         # Initialize components
         self.cowrie_monitor = CowrieMonitor(cowrie_host, cowrie_user, cowrie_key)
         self.feature_mapper = CowrieToNSLKDDMapper()
         
+        if CLOUD_MODE:
+            print("☁ Running in CLOUD MODE (Cowrie disabled)")
+        else:
+            self.cowrie_monitor.connect()
         # Load trained model
         self.model = None
         self.scaler = None
@@ -228,53 +236,99 @@ class IntegratedIDSEngine:
     #     print("✅ MODEL READY FOR LIVE INFERENCE")
 
 
+    # def start(self) -> bool:
+    #     """Start the IDS engine"""
+    #     print("\n" + "="*70)
+    #     print("🛡️  INTEGRATED IDS STARTING")
+    #     print("="*70)
+        
+    #     self.start_time = datetime.now()
+        
+    #     # Connect to Cowrie
+    #     print("\n🔌 Connecting to Cowrie honeypot...")
+    #     if not self.cowrie_monitor.connect():
+    #         print("❌ Failed to connect to Cowrie")
+    #         return False
+        
+    #     if not self.cowrie_monitor.test_connection():
+    #         print("❌ Connection test failed")
+    #         return False
+        
+    #     # Process historical data
+    #     print("\n📊 Loading and analyzing historical data...")
+    #     historical_events = self.cowrie_monitor.get_historical_logs(500)
+        
+    #     # Process historical events
+    #     for event in historical_events:
+    #         self._process_event(event, is_historical=True)
+        
+    #     print(f"✓ Processed {len(historical_events)} historical events")
+    #     print(f"✓ Detected {self.stats['attacks_detected']} attacks")
+    #     print(f"✓ Model confidence avg: {np.mean(self.stats['confidence_scores']):.2%}" 
+    #           if self.stats['confidence_scores'] else "")
+        
+    #     # Start real-time monitoring
+    #     print("\n🔴 Starting real-time monitoring...")
+    #     self.is_running = True
+    #     self.cowrie_monitor.start_monitoring(self._on_new_event)
+        
+    #     # Start cleanup thread
+    #     self.cleanup_thread = threading.Thread(
+    #         target=self._cleanup_old_sessions,
+    #         daemon=True
+    #     )
+    #     self.cleanup_thread.start()
+        
+    #     print("✓ IDS Engine active and monitoring")
+    #     print("\n" + "="*70)
+        
+    #     return True
     def start(self) -> bool:
-        """Start the IDS engine"""
         print("\n" + "="*70)
         print("🛡️  INTEGRATED IDS STARTING")
         print("="*70)
-        
+
         self.start_time = datetime.now()
-        
-        # Connect to Cowrie
-        print("\n🔌 Connecting to Cowrie honeypot...")
-        if not self.cowrie_monitor.connect():
-            print("❌ Failed to connect to Cowrie")
-            return False
-        
-        if not self.cowrie_monitor.test_connection():
-            print("❌ Connection test failed")
-            return False
-        
-        # Process historical data
-        print("\n📊 Loading and analyzing historical data...")
-        historical_events = self.cowrie_monitor.get_historical_logs(500)
-        
-        # Process historical events
-        for event in historical_events:
-            self._process_event(event, is_historical=True)
-        
-        print(f"✓ Processed {len(historical_events)} historical events")
-        print(f"✓ Detected {self.stats['attacks_detected']} attacks")
-        print(f"✓ Model confidence avg: {np.mean(self.stats['confidence_scores']):.2%}" 
-              if self.stats['confidence_scores'] else "")
-        
-        # Start real-time monitoring
-        print("\n🔴 Starting real-time monitoring...")
-        self.is_running = True
-        self.cowrie_monitor.start_monitoring(self._on_new_event)
-        
-        # Start cleanup thread
+
+        if not CLOUD_MODE:
+            print("\n🔌 Connecting to Cowrie honeypot...")
+            if not self.cowrie_monitor.connect():
+                print("❌ Failed to connect to Cowrie")
+                return False
+
+            if not self.cowrie_monitor.test_connection():
+                print("❌ Connection test failed")
+                return False
+
+            print("\n📊 Loading and analyzing historical data...")
+            historical_events = self.cowrie_monitor.get_historical_logs(500)
+
+            for event in historical_events:
+                self._process_event(event, is_historical=True)
+
+            print(f"✓ Processed {len(historical_events)} historical events")
+
+            print("\n🔴 Starting real-time monitoring...")
+            self.is_running = True
+            self.cowrie_monitor.start_monitoring(self._on_new_event)
+
+        else:
+            # CLOUD MODE
+            print("☁ Cowrie disabled — running in SIMULATION / API mode")
+            self.is_running = True
+
+        # Cleanup thread works in both modes
         self.cleanup_thread = threading.Thread(
             target=self._cleanup_old_sessions,
             daemon=True
         )
         self.cleanup_thread.start()
-        
-        print("✓ IDS Engine active and monitoring")
+
+        print("✓ IDS Engine active")
         print("\n" + "="*70)
-        
+
         return True
+
     
     def _on_new_event(self, event: Dict):
         """Callback for new Cowrie events"""
@@ -741,70 +795,3 @@ class IntegratedIDSEngine:
         
         print("\n✓ IDS Engine stopped")
 
-
-# Main execution
-def main():
-    """Main execution with trained model"""
-    
-    # Configuration
-    COWRIE_HOST = "98.94.3.233"
-    COWRIE_USER = "ubuntu"
-    COWRIE_KEY = "cowrie_key.pem"
-    MODEL_DIR = "models"
-    
-    # Initialize IDS with trained model
-    ids = IntegratedIDSEngine(COWRIE_HOST, COWRIE_USER, COWRIE_KEY, MODEL_DIR)
-    
-    # Register alert callback
-    def print_alert(incident: Dict):
-        """Print ML-based alert"""
-        print(f"\n🚨 ML ALERT: {incident['attack_type']} from {incident['src_ip']}")
-        print(f"   Severity: {incident['severity']}")
-        print(f"   Confidence: {incident['confidence']:.2%}")
-        print(f"   Attack Probability: {incident['attack_probability']:.2%}")
-        print(f"   Model: {incident['model_name']}")
-        
-        if incident['details'].get('username'):
-            print(f"   Username: {incident['details']['username']}")
-        
-        if incident['details'].get('command'):
-            print(f"   Command: {incident['details']['command']}")
-        
-        # Show key NSL-KDD features
-        nsl_features = incident['details'].get('nsl_kdd_features', {})
-        if any(nsl_features.values()):
-            print(f"   NSL-KDD Indicators:")
-            if nsl_features.get('hot', 0) > 0:
-                print(f"     - Hot indicators: {nsl_features['hot']}")
-            if nsl_features.get('num_compromised', 0) > 0:
-                print(f"     - Compromise indicators: {nsl_features['num_compromised']}")
-            if nsl_features.get('root_shell', 0) == 1:
-                print(f"     - Root shell detected!")
-    
-    ids.register_alert_callback(print_alert)
-    
-    # Start IDS
-    if ids.start():
-        print("\nPress Ctrl+C to stop monitoring\n")
-        
-        try:
-            while True:
-                time.sleep(30)
-                stats = ids.get_stats()
-                print(f"\n📊 Live Stats:")
-                print(f"   Events: {stats['total_events']} | "
-                      f"Attacks: {stats['attacks_detected']} | "
-                      f"IPs: {stats['unique_attackers']} | "
-                      f"Rate: {stats['attack_rate']}%")
-                print(f"   Model: {stats['model_info']['name']} | "
-                      f"Avg Confidence: {stats['avg_confidence']:.2%}")
-                
-        except KeyboardInterrupt:
-            print("\n\nReceived interrupt signal...")
-            ids.stop()
-    else:
-        print("\n❌ Failed to start IDS")
-
-
-if __name__ == "__main__":
-    main()

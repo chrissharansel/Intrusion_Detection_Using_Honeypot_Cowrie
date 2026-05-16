@@ -1,0 +1,29 @@
+# Core web & async
+Flask
+Flask-SocketIO
+eventlet
+
+# Data handling
+pandas
+numpy
+
+# ML / Model handling
+scikit-learn
+joblib
+xgboost
+lightgbm
+
+# Visualization (used in training scripts)
+matplotlib
+seaborn
+
+# Networking / SSH
+paramiko
+requests
+
+# Timezones (Python < 3.9 only; safe to include)
+tzdata
+
+# Optional but recommended
+python-socketio
+gunicorn
